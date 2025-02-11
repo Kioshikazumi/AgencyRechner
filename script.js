@@ -42,10 +42,10 @@ function deleteEntry(button) {
 
 function showLog() {
     document.getElementById('calculator').style.display = 'none';
-    document.getElementById('log-container').classList.add('visible');
+    document.getElementById('log-container').style.display = 'block';
 }
 
 function showCalculator() {
     document.getElementById('calculator').style.display = 'block';
-    document.getElementById('log-container').classList.remove('visible');
+    document.getElementById('log-container').style.display = 'none';
 }
