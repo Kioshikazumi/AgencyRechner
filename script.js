@@ -17,6 +17,7 @@ function berechne() {
     let umsatz = nach10Prozent - nach15Prozent;
     let einnahmen = Math.round(umsatz * 0.80);
     let abgabe = umsatz - einnahmen;
+    let waschzeit = Math.round(betrag / 50000);
     let timestamp = new Date().toLocaleString();
     
     document.getElementById('nach10').innerText = formatNumber(nach10Prozent) + " €";
@@ -24,6 +25,7 @@ function berechne() {
     document.getElementById('umsatz').innerText = formatNumber(umsatz) + " €";
     document.getElementById('einnahmen').innerText = formatNumber(einnahmen) + " €";
     document.getElementById('abgabe').innerText = formatNumber(abgabe) + " €";
+    document.getElementById('waschzeit').innerText = waschzeit;
     document.getElementById('nach15-label').innerText = "Bekommt " + familie + ": " + formatNumber(nach15Prozent) + " €";
     
     let logList = document.getElementById('log-list');
