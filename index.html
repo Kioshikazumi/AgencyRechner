@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geldwäsche Rechner</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="script.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div id="seite1" class="seite">
-            <h2>Geldwäsche Rechner</h2>
-            <input type="text" id="familienname" placeholder="Familienname">
-            <input type="number" id="betrag" placeholder="Betrag ($)">
-            <select id="gebuehr">
+    <div id="calculator">
+        <h2>Geldwäsche Rechner</h2>
+        <div class="container">
+            <label>Familienname:</label>
+            <input type="text" id="familienname" placeholder="Familienname eingeben">
+            <label>Schwarzgeld:</label>
+            <input type="number" id="betrag" placeholder="Betrag eingeben">
+            <label>Kurs Familie:</label>
+            <select id="abzug15">
                 <option value="5">5%</option>
                 <option value="10">10%</option>
                 <option value="15" selected>15%</option>
@@ -24,112 +26,25 @@
                 <option value="45">45%</option>
                 <option value="50">50%</option>
             </select>
-            <button onclick="berechnen()">Berechnen</button>
-            <p id="ergebnis"></p>
-            <button onclick="wechselZuSeite('seite2')">Aufträge ansehen</button>
+            <button onclick="berechne()">Berechnen</button>
         </div>
-
-        <div id="seite2" class="seite" style="display:none;">
-            <h2>Aufträge</h2>
-            <label for="startdatum">Von:</label>
-            <input type="date" id="startdatum">
-            <label for="enddatum">Bis:</label>
-            <input type="date" id="enddatum">
-            <button onclick="filtern()">Filter anwenden</button>
-            <div class="auftragsliste" id="auftragsliste"></div>
-            <button onclick="wechselZuSeite('seite1')">Zurück zum Rechner</button>
+        
+        <div class="result-container">
+            <h3>Ergebnisse:</h3>
+            <p>Gewaschen: <span id="nach10"></span></p>
+            <p id="nach15-label">Bekommt (Familienname): <span id="nach15"></span></p>
+            <p>Umsatz: <span id="umsatz"></span></p>
+            <p>Einnahmen: <span id="einnahmen"></span></p>
+            <p>Die Abgabe an La Morte: <span id="abgabe"></span></p>
         </div>
+        
+        <button onclick="showLog()">Zum Rechnungs-Log</button>
     </div>
-
-    <script>
-        let log = [];
-
-        function berechnen() {
-            let familienname = document.getElementById('familienname').value;
-            let betrag = parseFloat(document.getElementById('betrag').value);
-            let gebuehr = parseFloat(document.getElementById('gebuehr').value);
-
-            if (!familienname || isNaN(betrag) || betrag <= 0) {
-                document.getElementById('ergebnis').innerHTML = "Bitte gültige Werte eingeben.";
-                return;
-            }
-
-            let gebuehren_betrag = betrag * (gebuehr / 100);
-            let betrag_nach_gebuehr = betrag - gebuehren_betrag;
-            let waschgebuehr = betrag_nach_gebuehr * 0.10;
-            let gereinigtes_geld = betrag_nach_gebuehr - waschgebuehr;
-            let gewinn = gebuehren_betrag - waschgebuehr;
-            let lamorte_betrag = gewinn * 0.2;
-            let dein_nettogewinn = gewinn * 0.8;
-            let waschzeit = Math.ceil(betrag / 50000);
-
-            let ergebnisText = `
-                <strong>Ergebnisse:</strong><br>
-                <strong>Gereinigtes Geld:</strong> $${gereinigtes_geld.toLocaleString()}<br>
-                <strong>La Morte bekommt:</strong> $${lamorte_betrag.toLocaleString()} (${gebuehr * 0.2}%)<br>
-                <strong>Dein Nettogewinn:</strong> $${dein_nettogewinn.toLocaleString()}<br>
-                <strong>Waschzeit:</strong> ${waschzeit} Minuten
-            `;
-            document.getElementById('ergebnis').innerHTML = ergebnisText;
-
-            let datum = new Date().toISOString().split("T")[0]; // Datum speichern
-            let auftrag = {
-                datum: datum,
-                familie: familienname,
-                betrag: betrag,
-                gebuehr: gebuehr,
-                gereinigt: gereinigtes_geld,
-                lamorte: lamorte_betrag,
-                gewinn: dein_nettogewinn,
-                waschzeit: waschzeit
-            };
-
-            log.push(auftrag);
-            speichernLog();
-            anzeigenLog();
-        }
-
-        function speichernLog() {
-            localStorage.setItem("geldwaesche_log", JSON.stringify(log));
-        }
-
-        function anzeigenLog() {
-            let liste = document.getElementById('auftragsliste');
-            liste.innerHTML = "";
-            log.forEach(auftrag => {
-                liste.innerHTML += `<p><strong>${auftrag.datum}</strong>: ${auftrag.familie} - $${auftrag.betrag.toLocaleString()} (${auftrag.gebuehr}%)<br>
-                Gereinigtes Geld: $${auftrag.gereinigt.toLocaleString()} | La Morte: $${auftrag.lamorte.toLocaleString()} | Gewinn: $${auftrag.gewinn.toLocaleString()} | Zeit: ${auftrag.waschzeit} Min</p>`;
-            });
-        }
-
-        function filtern() {
-            let startdatum = document.getElementById('startdatum').value;
-            let enddatum = document.getElementById('enddatum').value;
-
-            let gefilterteLogs = log.filter(auftrag => {
-                return (!startdatum || auftrag.datum >= startdatum) && (!enddatum || auftrag.datum <= enddatum);
-            });
-
-            let liste = document.getElementById('auftragsliste');
-            liste.innerHTML = "";
-            gefilterteLogs.forEach(auftrag => {
-                liste.innerHTML += `<p><strong>${auftrag.datum}</strong>: ${auftrag.familie} - $${auftrag.betrag.toLocaleString()} (${auftrag.gebuehr}%)<br>
-                Gereinigtes Geld: $${auftrag.gereinigt.toLocaleString()} | La Morte: $${auftrag.lamorte.toLocaleString()} | Gewinn: $${auftrag.gewinn.toLocaleString()} | Zeit: ${auftrag.waschzeit} Min</p>`;
-            });
-        }
-
-        function wechselZuSeite(seite) {
-            document.getElementById('seite1').style.display = (seite === 'seite1') ? 'block' : 'none';
-            document.getElementById('seite2').style.display = (seite === 'seite2') ? 'block' : 'none';
-        }
-
-        window.onload = function () {
-            let gespeicherteLogs = localStorage.getItem("geldwaesche_log");
-            if (gespeicherteLogs) {
-                log = JSON.parse(gespeicherteLogs);
-                anzeigenLog();
-            }
-        };
-    </script>
+    
+    <div id="log-container" class="log-container">
+        <h2>Rechnungs-Log</h2>
+        <div id="log-list"></div>
+        <button class="back-button" onclick="showCalculator()">Zurück zum Rechner</button>
+    </div>
 </body>
 </html>
