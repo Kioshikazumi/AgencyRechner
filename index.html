@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Geldwäsche Rechner</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="script.js"></script>
+</head>
+<body>
+    <div id="calculator">
+        <h2>Geldwäsche Rechner</h2>
+        <div class="container">
+            <label>Familienname:</label>
+            <input type="text" id="familienname" placeholder="Familienname eingeben">
+            <label>Schwarzgeld:</label>
+            <input type="number" id="betrag" placeholder="Betrag eingeben">
+            <label>Kurs Familie:</label>
+            <select id="abzug15">
+                <option value="5">5%</option>
+                <option value="10">10%</option>
+                <option value="15" selected>15%</option>
+                <option value="20">20%</option>
+                <option value="25">25%</option>
+                <option value="30">30%</option>
+                <option value="35">35%</option>
+                <option value="40">40%</option>
+                <option value="45">45%</option>
+                <option value="50">50%</option>
+            </select>
+            <button onclick="berechne()">Berechnen</button>
+        </div>
+        
+        <div class="result-container">
+            <h3>Ergebnisse:</h3>
+            <p>Gewaschen: <span id="nach10"></span></p>
+            <p id="nach15-label">Bekommt (Familienname): <span id="nach15"></span></p>
+            <p>Umsatz: <span id="umsatz"></span></p>
+            <p>Einnahmen: <span id="einnahmen"></span></p>
+            <p>Die Abgabe an La Morte: <span id="abgabe"></span></p>
+        </div>
+        
+        <button onclick="showLog()">Zum Rechnungs-Log</button>
+    </div>
+    
+    <div id="log-container" class="log-container">
+        <h2>Rechnungs-Log</h2>
+        <div id="log-list"></div>
+        <button class="back-button" onclick="showCalculator()">Zurück zum Rechner</button>
+    </div>
+</body>
+</html>
